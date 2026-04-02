@@ -1,0 +1,40 @@
+from model import CoalitionModel
+
+print("=" * 50)
+print("PROBLEM 3 DEMO: Shared State as Ground Truth")
+print("=" * 50)
+print()
+print("Scenario: Task completes but message board")
+print("stays stale. Agents walk toward finished tasks.")
+print("-" * 50)
+
+model = CoalitionModel(width=8, height=8)
+
+# manually plant a stale post at step 0
+# task 0 already exists — we complete it artificially
+# but leave a recruitment post on the board
+stale_task = model.tasks[0]
+model.message_board[stale_task.task_id] = {
+    "recruiter": 99,
+    "posted_at": 0,
+    "task_pos": stale_task.grid_pos,
+    "task_id": stale_task.task_id
+}
+# mark task as already completed
+stale_task.completed = True
+print(f"Task {stale_task.task_id} at {stale_task.grid_pos} "
+      f"is COMPLETED but message board still shows recruitment.")
+print(f"Message board: {model.message_board}")
+print()
+
+for i in range(20):
+    model.step()
+
+print()
+print(f"--- Results ---")
+print(f"Wasted steps from stale posts: {model.wasted_steps}")
+print()
+print("This is Problem 3: agents treat message board")
+print("as ground truth. No freshness check exists.")
+print("SharedStateManager would discount stale posts")
+print("automatically based on age and completion status.")
