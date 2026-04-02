@@ -1,93 +1,118 @@
-<!-- After forking, you can update this readme to give an overview of your work and learning, if you want. -->
+# The Emperor's Dilemma LLM Model
 
-# Mesa GSoC Learning Space
-This is a template repository for GSoC candidates working on [Mesa](https://github.com/mesa/mesa). Fork it to create your personal learning space.
+## Summary
 
-## What is this?
-Before contributing to Mesa, you need to understand Mesa — not just the API, but how agent-based models work and how Mesa's pieces fit together. This repo is your space to do that learning, visibly.
+This model shows how unpopular norms dominate a society even when the vast majority privately reject them. Agents are equipped with individual private beliefs and conviction levels. The model demonstrates the illusion of mass agreement: agents afraid of appearing disloyal not only comply with a norm they hate, but also aggressively enforce it on their neighbors. This creates a trap of False Enforcement, where the loudest defenders of a norm are often its secret opponents.
 
-**The idea is simple: build models first, contribute second.**
+This model is implemented using Mesa-LLM, replacing the original mathematical threshold model with LLM-powered reasoning. Each agent uses natural language to reason about social pressure from neighbors and decides whether to publicly comply with the norm and whether to enforce it on others.
 
-This repo is also your chance to practice the open-source skills that make contributions successful: clear communication, clean git history, good documentation, collaboration, and code review. These matter as much as the code itself.
+## Technical Details
 
-_Everything here is a suggestion, nothing is mandatory. It's a tool to help you structure your own learning process. Use as you see fit._
+The Emperor's Dilemma Model simulates the spread of an unpopular norm using a single type of agent, Citizens.
 
-## Why build models?
-Mesa is a library *for modellers*. If you want to improve it, you need to experience it the way its users do. That means building models — not just reading the source code or tutorials.
+Each Citizen agent is characterized by:
 
-When you build models, you discover things you can't learn any other way:
-- **Where Mesa helps and where it gets in the way.** You'll hit friction points, confusing APIs, missing features, unclear documentation. These are the real problems worth solving — and you found them because you needed something to work, not because you were looking for a PR to open.
-- **How the pieces fit together.** Mesa has agents, models, spaces, data collection, visualization, event scheduling. Reading about them is different from wiring them together in a model that actually does something. Building gives you the architectural intuition that makes your contributions fit naturally into the framework.
-- **What modellers care about.** The best Mesa contributions historically come from people who hit a real problem in their own work. They understand the context because they live in it. Building models puts you in that position.
+- `private_belief`: Their true opinion of the norm (+1 supports, -1 rejects)
+- `conviction`: How strongly they hold their private belief (0.0 to 1.0)
+- `k`: The personal cost of enforcing the norm on neighbors
+- `compliance`: Their current public stance (1 = publicly complying, -1 = resisting)
+- `enforcement`: Whether they are actively pressuring neighbors (1 = enforcing, 0 = quiet)
 
-Without this experience, it's very hard to make contributions that actually help Mesa's users. You might write code that compiles and passes tests but solves a problem nobody has, or solves it in a way that doesn't fit how modellers think. Building models first prevents that.
+---
 
-## How to use this repo
-### 1. Fork this template
-Click "Use this template" (or fork) to create your own copy under your GitHub account.
+### Compliance Rule (Original Mathematical Model)
 
-### 2. Fill in your motivation
-Edit `motivation.md` — who you are, why Mesa, what you want to learn, where you want to go. Keep it honest and concise.
-
-### 3. Build models
-This is the core of the repo. Build Mesa models in the `models/` folder. Start simple, increase complexity. Each model should have its own folder with:
-- The model code
-- A `README.md` covering:
-  - What the model does and why you chose it
-  - What Mesa features it uses
-  - What you learned building it
-  - What was hard, what surprised you, what you'd do differently
-
-**Focus on learning, not impressing.** A simple model with a thoughtful README is worth more than a complex model you can't explain.
-
-### 4. Review and collaborate
-This is where you practice the collaborative side of open source:
-- **Review others' work**: Find another GSoC candidate's learning repo and open issues or PRs with feedback on their models. Be constructive and specific.
-- **Work together**: Build a model with another candidate. Use branches, PRs, and code review — the same workflow you'd use on Mesa itself.
-- **Document your reviews**: Keep notes in `reviews/` about models you reviewed and what you learned from reading someone else's code.
-
-Collaboration is not required, but it's noticed and valued. If you and another candidate review each other's models, improve each other's code, or build something together using proper git workflow — that demonstrates exactly the skills Mesa needs.
-
-### 5. Link to your Mesa PRs
-When you open a PR on any Mesa repo, link to the relevant work in this learning space. This gives reviewers context for your understanding without having to extract it through the review process.
-
-## Repo structure
+In the original model, a Citizen publicly complies if:
 
 ```
-├── motivation.md           # Who you are, why Mesa, what you want to learn
-├── models/
-│   ├── my_first_model/
-│   │   ├── model.py
-│   │   └── README.md       # What you built, what you learned
-│   ├── second_model/
-│   │   ├── ...
-│   │   └── README.md
-│   └── ...
-├── reviews/                 # Notes from reviewing other candidates' work
-│   └── ...
-└── notes/                   # Optional: design explorations, reading notes, scratch work
-    └── ...
+social_pressure > conviction
 ```
 
-## What makes a good learning space?
-- **Models that show progression.** Start with a basic model (Boltzmann Wealth, Schelling), then build something that stretches you — a model that uses discrete spaces, PropertyLayers, event scheduling, data collection, or visualization.
-- **Honest READMEs.** "I got stuck on X and solved it by Y" is more useful than a polished summary. We want to see your thinking, not a press release.
-- **Clean git practices.** Meaningful commit messages, branches for separate models, no giant "add everything" commits. This is practice for contributing to Mesa.
-- **Engagement with others.** Reviewing someone else's model, suggesting improvements, or building together shows you understand that open source is collaborative.
+Where:
 
-## Suggested starting points
-1. Go through Mesa's [introductory tutorials](https://mesa.readthedocs.io/latest/getting_started.html)
-2. Study the [core examples](https://github.com/mesa/mesa/tree/main/mesa/examples) — don't just run them, read the code and understand the design choices
-3. Build your own version of a classic ABM (Schelling, Sugarscape, flocking, etc.)
-4. Then build something original — a model for a domain you're interested in
-5. Read the [Mesa 3.5 release notes](https://github.com/mesa/mesa/releases) to understand recent changes and direction
-6. Look at [open discussions](https://github.com/mesa/mesa/discussions) to understand what Mesa is working toward
+```
+social_pressure = (-private_belief / num_neighbors) * sum_of_neighbor_enforcement
+```
 
-## Resources
-- [Mesa documentation](https://mesa.readthedocs.io/)
-- [Mesa contributing guide](https://github.com/mesa/mesa/blob/main/CONTRIBUTING.md)
-- [Mesa migration guide](https://mesa.readthedocs.io/latest/migration_guide.html)
-- [Community examples](https://github.com/mesa/mesa-examples)
-- [ABM concepts MOOC](https://ocw.tudelft.nl/course-lectures/agent-based-modeling/)
-- [Practical Mesa MOOC](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa)
-- [Matrix chat](https://matrix.to/#/#project-mesa:matrix.org)
+---
+
+### False Enforcement
+
+A Citizen engages in False Enforcement when they:
+- Privately reject the norm (`private_belief = -1`)
+- But publicly enforce it on neighbors (`enforcement = 1`)
+
+---
+
+### LLM-Powered Agents
+
+Citizens are implemented as LLM-powered agents, replacing the mathematical threshold with language-driven reasoning. Each agent:
+
+- Receives a system prompt which defines their stand: their private belief, conviction strength, and background
+- Observes their neighborhood: how many neighbors are complying and enforcing
+- Reasons in natural language about whether to publicly comply and whether to enforce
+- Uses tools to record their decisions back into the simulation
+
+
+
+---
+
+### The Model Tracks Three Key Metrics
+
+- Compliance: Fraction of agents publicly obeying the norm
+- Enforcement: Fraction of agents actively pressuring neighbors
+- False Enforcement: Fraction of disbelievers who are enforcing the norm
+
+## How to Run
+
+Clone the mesa-llm repository and install it:
+
+```bash
+pip install -e .
+```
+
+You will need an API key from an LLM provider. This model makes a large number of calls per step — we recommend a provider with generous rate limits.
+
+1. Install python-dotenv if not already installed:
+```bash
+pip install python-dotenv
+```
+
+2. In the root folder of the project, create a `.env` file.
+
+3. Add your API key — for example for OpenAI:
+```
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
+```
+Or for Groq:
+```
+GROQ_API_KEY=your-groq-api-key-here
+```
+
+4. Update the `LLM_MODEL` constant in `model.py` to your chosen model, in the format `{provider}/{model_name}`. For example:
+```python
+LLM_MODEL = "openai/gpt-4o-mini"
+```
+
+5. Run from this directory:
+```bash
+solara run app.py
+```
+
+**Note:** The default grid is 10x10 (100 agents). Each step requires approximately 200 LLM calls. For faster testing, reduce the grid size in `model.py` to 5x5.
+
+## Files
+
+* `model.py`: Core model code and data collection.
+* `agents.py`: LLM-powered citizen agent class.
+* `app.py`: Sets up the interactive Solara visualization.
+* `tools.py`: Tools for agents to record compliance and enforcement decisions.
+
+## Further Reading
+
+This model is adapted from:
+
+[Centola, D., Willer, R., & Macy, M. (2005). The Emperor's Dilemma: A Computational Model of Self-Enforcing Norms. American Journal of Sociology.](https://www.journals.uchicago.edu/doi/10.1086/427321)
+
+You can also find Mesa's original rule-based version of the model here:
+https://github.com/mesa/mesa-examples/tree/main/examples/emperor_dilemma
