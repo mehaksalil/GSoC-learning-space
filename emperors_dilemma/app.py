@@ -11,7 +11,7 @@ from mesa.visualization.components.portrayal_components import AgentPortrayalSty
 from model import EmperorLLMModel
 
 # Set your API key here
-os.environ["OPENROUTER_API_KEY"] = "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" # Replace with your key
+os.environ["OPENROUTER_API_KEY"] = "" # Replace with your key
 
 
 COLOR_COMPLY_QUIET = "#F0F8FF"
